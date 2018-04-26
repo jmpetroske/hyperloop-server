@@ -1,10 +1,11 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"net/http"
 	// "strings"
 	"github.com/gorilla/mux"
+	"net"
 	// "github.com/gorilla/websocket"
 )
 
@@ -28,6 +29,20 @@ func abortHandler(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
+func tcpSocket() {
+	ln, err := net.Listen("tcp", ":8000")
+	if err != nil {
+		// handle error
+		panic(err)
+	}
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("%b", conn)
+	}
+}
 
 func main() {
 	router := mux.NewRouter()
@@ -38,5 +53,7 @@ func main() {
 	router.HandleFunc("/abort", abortHandler)
 	http.Handle("/", router)
 
+	go tcpSocket();
+	
 	panic(http.ListenAndServe(":8080", router))
 }
