@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	// "strings"
-	"github.com/gorilla/mux"
 	"net"
-	// "github.com/gorilla/websocket"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 func missionHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +30,8 @@ func abortHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func tcpSocket() {
+	readBuf := make([]byte, 2048)
+	
 	ln, err := net.Listen("tcp", ":8000")
 	if err != nil {
 		// handle error
@@ -40,20 +42,43 @@ func tcpSocket() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("%b", conn)
+		fmt.Println("Successfully connected");
+		fmt.Println("%b", conn);
+		bytesRead, err := conn.Read(readBuf);
+		fmt.Println(bytesRead)
 	}
 }
 
-func main() {
+var upgrader = websocket.Upgrader{
+    ReadBufferSize:  1024,
+    WriteBufferSize: 1024,
+}
+
+func serveWebSocket(w http.ResponseWriter, r *http.Request) {
+	webSocket, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	webSocket.WriteMessage(websocket.TextMessage, []byte("Hello"));
+}
+
+func startWebClient() {
 	router := mux.NewRouter()
 	router.HandleFunc("/mission", missionHandler)
 	router.HandleFunc("/arm", armHandler)
 	router.HandleFunc("/start", startHandler)
 	router.HandleFunc("/command", commandHandler)
 	router.HandleFunc("/abort", abortHandler)
+	router.HandleFunc("/dataWebSocket", abortHandler)
 	http.Handle("/", router)
 
-	go tcpSocket();
-	
 	panic(http.ListenAndServe(":8080", router))
+}
+
+func main() {
+	// TODO init
+	go tcpSocket();
+	startWebClient();
 }
