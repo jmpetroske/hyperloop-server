@@ -7,6 +7,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const webServerAddress string = ":8080"
+
 func missionHandler(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
@@ -52,5 +54,5 @@ func startWebServer() {
 	router.HandleFunc("/dataWebSocket", abortHandler)
 	http.Handle("/", router)
 
-	panic(http.ListenAndServe(":8080", router))
+	panic(http.ListenAndServe(webServerAddress, router))
 }
