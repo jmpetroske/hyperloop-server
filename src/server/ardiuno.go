@@ -47,10 +47,11 @@ func udpSocket() {
 			continue
 		}
 
-		fmt.println("Got UDP packet from teensy: " + string(buf[0:n]))
+		fmt.Println("Got UDP packet from teensy: " + string(buf[0:n]))
 	}
 }
 
 func startArduinoComs() {
+	go udpSocket()
 	tcpSocket()
 }
