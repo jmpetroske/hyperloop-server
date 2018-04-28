@@ -1,10 +1,10 @@
-package main;
+package main
 
 import (
 	"fmt"
-	"net/http"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"net/http"
 )
 
 const webServerAddress string = ":8080"
@@ -30,8 +30,8 @@ func abortHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 var upgrader = websocket.Upgrader{
-    ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 }
 
 func serveWebSocket(w http.ResponseWriter, r *http.Request) {
