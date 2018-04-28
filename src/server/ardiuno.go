@@ -8,8 +8,8 @@ import (
 const UDP_MAX_PACKET_SIZE int = 2048
 
 const serverTCPAddress string = ":8000"
-const serverUDPAddress UDPAddr = net.ResolveUDPAddr("udp",":8000")
-const teensyUDPAddress UDPAddr = net.ResolveUDPAddr("udp","192.168.1.100:8000")
+var serverUDPAddress, _ = net.ResolveUDPAddr("udp",":8000")
+var teensyUDPAddress, _ = net.ResolveUDPAddr("udp","192.168.1.100:8000")
 
 func tcpSocket() {
 	readBuf := make([]byte, 2048)
@@ -34,8 +34,20 @@ func udpSocket() {
 	if err != nil {
 		panic(err)
 	}
+	buf := make([]byte, UDP_MAX_PACKET_SIZE)
 	for {
-		buf := make([]byte, UDP_MAX_PACKET_SIZE)
+		n, senderAddr, err := udpConn.ReadFromUDP(buf)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if !senderAddr.IP.Equal(teensyUDPAddress.IP) ||
+			senderAddr.Port != teensyUDPAddress.Port {
+			fmt.Println("Got UDP packet from non teensy address")
+			continue
+		}
+
+		fmt.println("Got UDP packet from teensy: " + string(buf[0:n]))
 	}
 }
 
