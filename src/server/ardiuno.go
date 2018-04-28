@@ -3,6 +3,7 @@ package main;
 import (
     "fmt"
     "net"
+	"log"
 )
 
 type DataFrame struct {
@@ -28,9 +29,10 @@ func tcpSocket() {
         if err != nil {
             panic(err)
         }
-        fmt.Println("Successfully connected")
+		// TODO check that this is a connection to the teensy
+        log.Println("Got TCP connection with teensy")
         bytesRead, err := conn.Read(readBuf)
-        fmt.Println(bytesRead)
+        log.Println(bytesRead)
     }
 }
 
@@ -43,16 +45,16 @@ func udpSocket() {
     for {
         n, senderAddr, err := udpConn.ReadFromUDP(buf)
         if err != nil {
-            fmt.Println(err)
+            log.Println(err)
             continue
         }
         if !senderAddr.IP.Equal(teensyUDPAddress.IP) ||
             senderAddr.Port != teensyUDPAddress.Port {
-            fmt.Println("Got UDP packet from non teensy address")
+            log.Println("Got UDP packet from non teensy address")
             continue
         }
 
-        fmt.Println("Got UDP packet from teensy: " + string(buf[0:n]))
+        log.Println("Got UDP packet from teensy: " + string(buf[0:n]))
     }
 }
 
