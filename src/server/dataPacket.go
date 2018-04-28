@@ -1,0 +1,50 @@
+package main
+
+type DataPacket struct {
+	timestamp                    uint32 // a timestamp in us/ms?
+	pressureThrusterTank         float32
+	pressureBrakingTank          float32
+	pressureBrakingExtend        float32
+	pressureBrakingCompress      float32
+	temperatureThrusterLeftTank  float32
+	temperatureThrusterRightTank float32
+	temperatureThrusterNozzle    float32
+	temperatureBattery           float32
+	temperatureBrakingTank       float32
+	temperatureBrakingExtend     float32
+	temperatureBrakingCompress   float32
+	halleffect1                  uint32
+	halleffect2                  uint32
+	halleffect3                  uint32
+	halleffect4                  uint32
+	vibration1                   float32
+	vibration2                   float32
+	vibration3                   float32
+	vibration4                   float32
+	actuationThruster            bool
+	actuationRelieveValve        bool
+	actuationSafetyValve         bool
+	actuationBrakingValve        bool
+	currentThrusterLeftValve     float32
+	currentThrusterRightValve    float32
+	currentThrusterRelieveValve  float32
+	currentBrakingValve          float32
+	currentNAP                   float32
+	currentBattery               float32
+	voltageThrusterLeftValve     float32
+	voltageThrusterRightValve    float32
+	voltageThrusterRelieveValve  float32
+	voltageBrakingValve          float32
+	voltageNAP                   float32
+	voltageBattery               float32
+	orientationx                 float32
+	orientationy                 float32
+	orientationz                 float32
+	accelerationx                float32
+	accelerationy                float32
+	accelerationz                float32
+	imuStatus                    uint32
+	brakeStatus                  uint32
+	propulsionStatus             uint32
+	emergencyBrake               bool
+}
