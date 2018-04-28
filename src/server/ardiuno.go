@@ -5,7 +5,7 @@ import (
     "net"
 )
 
-typedef DataFrame struct {
+type DataFrame struct {
     speed int
     // TODO
 }
@@ -56,8 +56,8 @@ func udpSocket() {
     }
 }
 
-func parseDataPacket([]byte dataPacket) *DataFrame {
-	return &DataFrame{}
+func parseDataPacket(dataPacket []byte) *DataFrame {
+    return &DataFrame{}
 }
 
 func startArduinoComs() {
