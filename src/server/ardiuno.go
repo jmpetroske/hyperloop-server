@@ -5,11 +5,7 @@ import (
 	"net"
 )
 
-type DataFrame struct {
-	speed int
-	// TODO
-}
-
+const SEND_RATIO = 100 // Send 1 in 100 packets
 const UDP_MAX_PACKET_SIZE int = 2048
 
 const serverTCPAddress string = ":8000"
@@ -36,12 +32,13 @@ func tcpSocket() {
 	}
 }
 
-func udpSocket() {
+func udpSocket(dataChan chan<- DataPacket) {
 	udpConn, err := net.ListenUDP("udp", serverUDPAddress)
 	if err != nil {
 		panic(err)
 	}
 	buf := make([]byte, UDP_MAX_PACKET_SIZE)
+	numSent := 0
 	for {
 		n, senderAddr, err := udpConn.ReadFromUDP(buf)
 		if err != nil {
@@ -57,14 +54,20 @@ func udpSocket() {
 		log.Println("Got UDP packet from teensy: " + string(buf[0:n]))
 		dataPacket := parseDataPacket(buf[0:n])
 		logDataPacket(dataPacket)
+		
+		if numSent % SEND_RATIO == 0 {
+			dataChan <- dataPacket
+		}
+		
+		numSent++
 	}
 }
 
-func parseDataPacket(dataPacket []byte) *DataPacket {
+func parseDataPacket(data []byte) *DataPacket {
 	return &DataPacket{}
 }
 
-func startArduinoComs() {
-	go udpSocket()
+func startArduinoComs(dataChan chan<- DataPacket) {
+	go udpSocket(dataChan)
 	tcpSocket()
 }

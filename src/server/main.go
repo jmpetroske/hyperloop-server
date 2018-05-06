@@ -1,6 +1,7 @@
 package main
 
 func main() {
-	go startArduinoComs()
-	startWebServer()
+	var dataPacketChan chan DataPacket = make(chan DataPacket, 10)
+	go startArduinoComs(dataPacketChan)
+	startWebServer(dataPacketChan)
 }
