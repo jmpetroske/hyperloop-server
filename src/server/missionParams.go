@@ -1,7 +1,7 @@
 package main
 
 struct MissionParams struct {
-	distance float32
-	pressure float32
-	topSpeed float32
+	Distance float32 `json:"distance"`
+	Pressure float32 `json:"pressure"`
+	TopSpeed float32 `json:"topSpeed"`
 }

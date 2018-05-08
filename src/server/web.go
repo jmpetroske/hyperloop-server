@@ -11,13 +11,15 @@ import (
 const webServerAddress string = ":8080"
 
 func missionHandler(w http.ResponseWriter, r *http.Request) {
-	http.NotFound(w, r)
-	// missionParamsChan <- params
+	params := MissionParams{
+		Distance: r.FormValue("distance"),
+		Pressure: r.FormValue("pressure"),
+		TopSpeed: r.FormValue("topSpeed"),
+	}
 }
 
 func armHandler(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
-	//
 }
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,24 +46,20 @@ func serveWebSocket(w http.ResponseWriter, r *http.Request, dataChan <-chan Data
 		return
 	}
 
-	webSocket.WriteMessage(websocket.TextMessage, []byte("Hello Vincent"))
 	for {
-		data, err := json.Marshal(<-dataChan)
-		if err != nil {
-			fmt.Println(err)
-			return
+		if err = webSocket.WriteJSON(<-dataChan); err != nil {
+			log.Println(err)
 		}
-		webSocket.WriteMessage(websocket.TextMessage, data)
 	}
 }
 
 func startWebServer(dataChan <-chan DataPacket) {
 	router := mux.NewRouter()
-	router.HandleFunc("/mission", missionHandler)
-	router.HandleFunc("/arm", armHandler)
-	router.HandleFunc("/start", startHandler)
-	router.HandleFunc("/command", commandHandler)
-	router.HandleFunc("/abort", abortHandler)
+	router.HandleFunc("/mission", missionHandler).Methods("POST")
+	router.HandleFunc("/arm", armHandler).Methods("POST")
+	router.HandleFunc("/start", startHandler).Methods("POST")
+	router.HandleFunc("/command", commandHandler).Methods("POST")
+	router.HandleFunc("/abort", abortHandler).Methods("POST")
 	router.HandleFunc("/dataWebSocket", func(w http.ResponseWriter, r *http.Request) {
 		serveWebSocket(w, r, dataChan)
 	})

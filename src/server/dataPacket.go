@@ -1,49 +1,49 @@
 package main
 
 type DataPacket struct {
-	Timestamp uint32
-	Mode uint32
-	PressureThrusterTank float32
-	PressureBrakingTank float32
-	PressureBrakingExtend float32
-	PressureBrakingCompress float32
-	TemperatureThrusterLeftTank float32
-	TemperatureThrusterRightTank float32
-	TemperatureThrusterNozzle float32
-	TemperatureBattery float32
-	TemperatureBrakingTank float32
-	TemperatureBrakingExtend float32
-	TemperatureBrakingCompress float32
-	Speed float32
-	Distance float32
-	Vibration1 float32
-	Vibration2 float32
-	Vibration3 float32
-	Vibration4 float32
-	ActuationThruster bool
-	ActuationRelieveValve bool
-	ActuationSafetyValve bool
-	ActuationBrakingValve bool
-	CurrentThrusterLeftValve float32
-	CurrentThrusterRightValve float32
-	CurrentThrusterRelieveValve float32
-	CurrentBrakingValve float32
-	CurrentNAP float32
-	CurrentBattery float32
-	VoltageThrusterLeftValve float32
-	VoltageThrusterRightValve float32
-	VoltageThrusterRelieveValve float32
-	VoltageBrakingValve float32
-	VoltageNAP float32
-	VoltageBattery float32
-	Orientationx float32
-	Orientationy float32
-	Orientationz float32
-	Accelerationx float32
-	Accelerationy float32
-	Accelerationz float32
-	ImuStatus uint32
-	BrakeStatus uint32
-	PropulsionStatus uint32
-	EmergencyBrake bool
+	Timestamp                    uint32  `json:"timestamp"`
+	Mode                         uint32  `json:"mode"`
+	PressureThrusterTank         float32 `json:"pressureThrusterTank"`
+	PressureBrakingTank          float32 `json:"pressureBrakingTank"`
+	PressureBrakingExtend        float32 `json:"pressureBrakingExtend"`
+	PressureBrakingCompress      float32 `json:"pressureBrakingCompress"`
+	TemperatureThrusterLeftTank  float32 `json:"temperatureThrusterLeftTank"`
+	TemperatureThrusterRightTank float32 `json:"temperatureThrusterRightTank"`
+	TemperatureThrusterNozzle    float32 `json:"temperatureThrusterNozzle"`
+	TemperatureBattery           float32 `json:"temperatureBattery"`
+	TemperatureBrakingTank       float32 `json:"temperatureBrakingTank"`
+	TemperatureBrakingExtend     float32 `json:"temperatureBrakingExtend"`
+	TemperatureBrakingCompress   float32 `json:"temperatureBrakingCompress"`
+	Speed                        float32 `json:"speed"`
+	Distance                     float32 `json:"distance"`
+	Vibration1                   float32 `json:"vibration1"`
+	Vibration2                   float32 `json:"vibration2"`
+	Vibration3                   float32 `json:"vibration3"`
+	Vibration4                   float32 `json:"vibration4"`
+	ActuationThruster            bool    `json:"actuationThruster"`
+	ActuationRelieveValve        bool    `json:"actuationRelieveValve"`
+	ActuationSafetyValve         bool    `json:"actuationSafetyValve"`
+	ActuationBrakingValve        bool    `json:"actuationBrakingValve"`
+	CurrentThrusterLeftValve     float32 `json:"currentThrusterLeftValve"`
+	CurrentThrusterRightValve    float32 `json:"currentThrusterRightValve"`
+	CurrentThrusterRelieveValve  float32 `json:"currentThrusterRelieveValve"`
+	CurrentBrakingValve          float32 `json:"currentBrakingValve"`
+	CurrentNAP                   float32 `json:"currentNAP"`
+	CurrentBattery               float32 `json:"currentBattery"`
+	VoltageThrusterLeftValve     float32 `json:"voltageThrusterLeftValve"`
+	VoltageThrusterRightValve    float32 `json:"voltageThrusterRightValve"`
+	VoltageThrusterRelieveValve  float32 `json:"voltageThrusterRelieveValve"`
+	VoltageBrakingValve          float32 `json:"voltageBrakingValve"`
+	VoltageNAP                   float32 `json:"voltageNAP"`
+	VoltageBattery               float32 `json:"voltageBattery"`
+	Orientationx                 float32 `json:"orientationx"`
+	Orientationy                 float32 `json:"orientationy"`
+	Orientationz                 float32 `json:"orientationz"`
+	Accelerationx                float32 `json:"accelerationx"`
+	Accelerationy                float32 `json:"accelerationy"`
+	Accelerationz                float32 `json:"accelerationz"`
+	ImuStatus                    uint32  `json:"imuStatus"`
+	BrakeStatus                  uint32  `json:"brakeStatus"`
+	PropulsionStatus             uint32  `json:"propulsionStatus"`
+	EmergencyBrake               bool    `json:"emergencyBrake"`
 }
