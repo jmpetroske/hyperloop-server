@@ -20,7 +20,7 @@ var latestData *DataPacket
 var commandChan = make(chan PhotonCommand, 3)
 
 func tcpSocket() {
-	readBuf := make([]byte, 2048)
+	// readBuf := make([]byte, 2048)
 
 	listener, err := net.Listen("tcp", serverTCPAddress)
 	if err != nil {
@@ -36,7 +36,7 @@ func tcpSocket() {
 		// bytesRead, err := conn.Read(readBuf)
 		// log.Println(bytesRead)
 		for {
-			bytesRead, err := conn.Write((<-commandChan).WriteCommand())
+			_, err := conn.Write((<-commandChan).WriteCommand())
 			if err != nil {
 				log.Println(err)
 			}
