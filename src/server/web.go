@@ -42,18 +42,26 @@ func missionHandler(w http.ResponseWriter, r *http.Request) {
 
 func armHandler(w http.ResponseWriter, r *http.Request) {
 	commandChan <- &ArmCommand{}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{success: true}"))
 }
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
 	commandChan <- &StartCommand{}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{success: true}"))
 }
 
 func commandHandler(w http.ResponseWriter, r *http.Request) {
 	commandChan <- &TestingCommand{ /* TODO */ }
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{success: true}"))
 }
 
 func abortHandler(w http.ResponseWriter, r *http.Request) {
 	commandChan <- &AbortCommand{}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{success: true}"))
 }
 
 var upgrader = websocket.Upgrader{

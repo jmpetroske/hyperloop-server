@@ -33,8 +33,14 @@ func tcpSocket() {
 		}
 		// TODO check that this is a connection to the teensy
 		log.Println("Got TCP connection with teensy")
-		bytesRead, err := conn.Read(readBuf)
-		log.Println(bytesRead)
+		// bytesRead, err := conn.Read(readBuf)
+		// log.Println(bytesRead)
+		for {
+			bytesRead, err := conn.Write((<-commandchan).WriteCommand())
+			if err != nil {
+				log.Println(err)
+			}
+		}
 	}
 }
 
