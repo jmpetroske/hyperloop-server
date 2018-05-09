@@ -3,11 +3,11 @@ package main
 type TestingCommandEnum int
 
 const (
-	EngageBreaks         TestingCommandEnum = 1 << iota
-	DisengageBreaks      TestingCommandEnum = 1 << iota
-	EngageSolenoids      TestingCommandEnum = 1 << iota
-	DisengageSolenoids   TestingCommandEnum = 1 << iota
-	EngageBallValves     TestingCommandEnum = 1 << iota
+	EngageBreaks        TestingCommandEnum = 1 << iota
+	DisengageBreaks     TestingCommandEnum = 1 << iota
+	EngageSolenoids     TestingCommandEnum = 1 << iota
+	DisengageSolenoids  TestingCommandEnum = 1 << iota
+	EngageBallValves    TestingCommandEnum = 1 << iota
 	DisengageBallValves TestingCommandEnum = 1 << iota
 )
 

@@ -58,6 +58,7 @@ func commandHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "400 - missing the command parameter", http.StatusBadRequest)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("{success: true}"))
 }

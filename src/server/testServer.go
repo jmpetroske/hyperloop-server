@@ -111,7 +111,7 @@ func main() {
 		0,
 		1,
 		false}
-	
+
 	router := mux.NewRouter()
 	router.HandleFunc("/mission", missionHandler)
 	router.HandleFunc("/arm", armHandler)
