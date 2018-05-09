@@ -36,7 +36,7 @@ func tcpSocket() {
 		// bytesRead, err := conn.Read(readBuf)
 		// log.Println(bytesRead)
 		for {
-			bytesRead, err := conn.Write((<-commandchan).WriteCommand())
+			bytesRead, err := conn.Write((<-commandChan).WriteCommand())
 			if err != nil {
 				log.Println(err)
 			}

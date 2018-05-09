@@ -54,6 +54,10 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 
 func commandHandler(w http.ResponseWriter, r *http.Request) {
 	commandChan <- &TestingCommand{ /* TODO */ }
+	if r.FormValue("command") == "" {
+		http.Error(w, "400 - missing the command parameter", http.StatusBadRequest)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("{success: true}"))
 }

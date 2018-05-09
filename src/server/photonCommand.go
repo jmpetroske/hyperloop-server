@@ -8,7 +8,7 @@ const (
 	EngageSolenoids      TestingCommandEnum = 1 << iota
 	DisengageSolenoids   TestingCommandEnum = 1 << iota
 	EngageBallValves     TestingCommandEnum = 1 << iota
-	DisengageBallValves3 TestingCommandEnum = 1 << iota
+	DisengageBallValves TestingCommandEnum = 1 << iota
 )
 
 type PhotonCommand interface {
