@@ -52,13 +52,32 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("{success: true}"))
 }
 
+/*
+ * valid command values:
+ * 0: engageBreaks
+ * 1: disengageBreaks
+ * 2: engageSolenoids
+ * 3: disengageSolenoids
+ * 4: engageBallValves
+ * 5: disengageBallValves
+ */
 func commandHandler(w http.ResponseWriter, r *http.Request) {
-	commandChan <- &TestingCommand{ /* TODO */ }
 	if r.FormValue("command") == "" {
 		http.Error(w, "400 - missing the command parameter", http.StatusBadRequest)
 		return
 	}
-
+	command, err := strconv.ParseInt(r.FormValue("command"), 10, 32)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "400 - invalid command parameter. Pass an int", http.StatusBadRequest)
+		return
+	}
+	if command < 0 || command > 5 {
+		http.Error(w, "400 - invalid command parameter, not in the valid range of values",
+			http.StatusBadRequest)
+		return
+	}
+	commandChan <- &TestingCommand{TestingCommandEnum(command)}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("{success: true}"))
 }
