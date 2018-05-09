@@ -1,5 +1,5 @@
 package main
 
-struct CommandParams struct {
-	command int32;
+type CommandParams struct {
+	command int32
 }

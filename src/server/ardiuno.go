@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"sync"
 )
 
 const SEND_RATIO = 100 // Send 1 in 100 packets
@@ -12,6 +13,11 @@ const serverTCPAddress string = ":8000"
 
 var serverUDPAddress, _ = net.ResolveUDPAddr("udp", ":8000")
 var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8000")
+
+var latestDataMutex = &sync.Mutex{}
+var latestData *DataPacket
+
+var commandChan = make(chan PhotonCommand, 3)
 
 func tcpSocket() {
 	readBuf := make([]byte, 2048)
@@ -32,7 +38,7 @@ func tcpSocket() {
 	}
 }
 
-func udpSocket(dataChan chan<- DataPacket) {
+func udpSocket() {
 	udpConn, err := net.ListenUDP("udp", serverUDPAddress)
 	if err != nil {
 		panic(err)
@@ -54,11 +60,10 @@ func udpSocket(dataChan chan<- DataPacket) {
 		log.Println("Got UDP packet from teensy: " + string(buf[0:n]))
 		dataPacket := parseDataPacket(buf[0:n])
 		logDataPacket(dataPacket)
-		
-		if numSent % SEND_RATIO == 0 {
-			dataChan <- dataPacket
-		}
-		
+		latestDataMutex.Lock()
+		latestData = dataPacket
+		latestDataMutex.Unlock()
+
 		numSent++
 	}
 }
@@ -67,7 +72,7 @@ func parseDataPacket(data []byte) *DataPacket {
 	return &DataPacket{}
 }
 
-func startArduinoComs(dataChan chan<- DataPacket) {
-	go udpSocket(dataChan)
+func startArduinoComs() {
+	go udpSocket()
 	go tcpSocket()
 }
