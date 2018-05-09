@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 const webServerAddress string = ":8080"
@@ -91,19 +91,24 @@ func abortHandler(w http.ResponseWriter, r *http.Request) {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 	webSocket, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
 	for {
 		if err = webSocket.WriteJSON(DataPacket{}); err != nil {
 			log.Println(err)
+			return
 		}
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 

@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net"
-	"sync"
 )
 
 const SEND_RATIO = 100 // Send 1 in 100 packets
@@ -13,11 +12,6 @@ const serverTCPAddress string = ":8000"
 
 var serverUDPAddress, _ = net.ResolveUDPAddr("udp", ":8000")
 var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8000")
-
-var latestDataMutex = &sync.Mutex{}
-var latestData *DataPacket
-
-var commandChan = make(chan PhotonCommand, 3)
 
 func tcpSocket() {
 	// readBuf := make([]byte, 2048)
