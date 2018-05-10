@@ -59,11 +59,18 @@ func startFakeArduino() {
 			log.Println(<-commandChan)
 		}
 	}()
+	
+	latestDataMutex.Lock()
+	latestData = &testData
 
+	latestDataMutex.Unlock()
+	
 	for {
+		latestDataMutex.Lock()
 		testData.Timestamp += 100000
 		testData.Speed += (rand.Float32() - 0.2) * 0.3
 		testData.Distance += testData.Speed * 0.1
+		latestDataMutex.Unlock()
 		time.Sleep(100 * time.Millisecond)
 	}
 }

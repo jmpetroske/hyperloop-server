@@ -104,7 +104,13 @@ func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for {
-		if err = webSocket.WriteJSON(DataPacket{}); err != nil {
+		var err error = nil
+		latestDataMutex.Lock()
+		if latestData != nil {
+			err = webSocket.WriteJSON(*latestData)
+		}
+		latestDataMutex.Unlock()
+		if err != nil {
 			log.Println(err)
 			return
 		}
