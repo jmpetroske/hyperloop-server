@@ -1,8 +1,10 @@
 package main
 
 import (
-	_ "bytes"
+	"bytes"
+	"encoding/binary"
 	"log"
+	"math"
 	"net"
 	"reflect"
 )
@@ -71,7 +73,7 @@ func udpSocket() {
 }
 
 func parseDataPacket(data []byte) *DataPacket {
-	// dataVals := bytes.Split(data, []byte{','})
+	dataVals := bytes.Split(data, []byte{','})
 	retval := DataPacket{}
 	reflectValue := reflect.ValueOf(&retval).Elem()
 	for i := 0; i < reflectValue.NumField(); i++ {
@@ -80,13 +82,17 @@ func parseDataPacket(data []byte) *DataPacket {
 		switch field.Kind() {
 		case reflect.Uint32:
 			// TODO
-			field.SetUint(0)
+			field.SetUint(uint64(binary.LittleEndian.Uint32(dataVals[i])))
 		case reflect.Float32:
 			// TODO
-			field.SetFloat(0.0)
+			field.SetFloat(float64(math.Float32frombits(binary.LittleEndian.Uint32(dataVals[i]))))
 		case reflect.Bool:
 			// TODO
-			field.SetBool(false)
+			noZeros := true
+			for _, b := range dataVals[i] {
+				noZeros = noZeros || b == 0
+			}
+			field.SetBool(noZeros)
 		default:
 			log.Println("Error parsing data from teensy, bad use of reflection")
 		}
