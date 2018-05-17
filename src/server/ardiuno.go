@@ -91,7 +91,7 @@ func parseDataPacket(data []byte) *DataPacket {
 			log.Println("Error parsing data from teensy, bad use of reflection")
 		}
 	}
-	
+
 	return &retval
 }
 
