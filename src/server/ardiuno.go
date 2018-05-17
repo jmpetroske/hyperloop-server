@@ -1,8 +1,10 @@
 package main
 
 import (
+	_ "bytes"
 	"log"
 	"net"
+	"reflect"
 )
 
 const SEND_RATIO = 100 // Send 1 in 100 packets
@@ -69,7 +71,28 @@ func udpSocket() {
 }
 
 func parseDataPacket(data []byte) *DataPacket {
-	return &DataPacket{}
+	// dataVals := bytes.Split(data, []byte{','})
+	retval := DataPacket{}
+	reflectValue := reflect.ValueOf(&retval).Elem()
+	for i := 0; i < reflectValue.NumField(); i++ {
+		field := reflectValue.Field(i)
+
+		switch field.Kind() {
+		case reflect.Uint32:
+			// TODO
+			field.SetUint(0)
+		case reflect.Float32:
+			// TODO
+			field.SetFloat(0.0)
+		case reflect.Bool:
+			// TODO
+			field.SetBool(false)
+		default:
+			log.Println("Error parsing data from teensy, bad use of reflection")
+		}
+	}
+	
+	return &retval
 }
 
 func startArduinoComs() {
