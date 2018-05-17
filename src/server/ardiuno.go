@@ -97,5 +97,5 @@ func parseDataPacket(data []byte) *DataPacket {
 
 func startArduinoComs() {
 	go udpSocket()
-	go tcpSocket()
+	tcpSocket()
 }

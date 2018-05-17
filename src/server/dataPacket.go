@@ -3,17 +3,14 @@ package main
 type DataPacket struct {
 	Timestamp                    uint32  `json:"timestamp"`
 	Mode                         uint32  `json:"mode"`
-	PressureThrusterTank         float32 `json:"pressureThrusterTank"`
-	PressureBrakingTank          float32 `json:"pressureBrakingTank"`
-	PressureBrakingExtend        float32 `json:"pressureBrakingExtend"`
-	PressureBrakingCompress      float32 `json:"pressureBrakingCompress"`
+	PressureThrusterTank         bool    `json:"pressureThrusterTank"`
+	PressureBrakingTank          bool    `json:"pressureBrakingTank"`
+	PressureBrakingExtend        bool    `json:"pressureBrakingExtend"`
+	PressureBrakingCompress      bool    `json:"pressureBrakingCompress"`
 	TemperatureThrusterLeftTank  float32 `json:"temperatureThrusterLeftTank"`
 	TemperatureThrusterRightTank float32 `json:"temperatureThrusterRightTank"`
-	TemperatureThrusterNozzle    float32 `json:"temperatureThrusterNozzle"`
+	TemperatureBraking           float32 `json:"temperatureBraking"`
 	TemperatureBattery           float32 `json:"temperatureBattery"`
-	TemperatureBrakingTank       float32 `json:"temperatureBrakingTank"`
-	TemperatureBrakingExtend     float32 `json:"temperatureBrakingExtend"`
-	TemperatureBrakingCompress   float32 `json:"temperatureBrakingCompress"`
 	Speed                        float32 `json:"speed"`
 	Distance                     float32 `json:"distance"`
 	Vibration1                   float32 `json:"vibration1"`
@@ -26,15 +23,11 @@ type DataPacket struct {
 	ActuationBrakingValve        bool    `json:"actuationBrakingValve"`
 	CurrentThrusterLeftValve     float32 `json:"currentThrusterLeftValve"`
 	CurrentThrusterRightValve    float32 `json:"currentThrusterRightValve"`
-	CurrentThrusterRelieveValve  float32 `json:"currentThrusterRelieveValve"`
 	CurrentBrakingValve          float32 `json:"currentBrakingValve"`
-	CurrentNAP                   float32 `json:"currentNAP"`
 	CurrentBattery               float32 `json:"currentBattery"`
 	VoltageThrusterLeftValve     float32 `json:"voltageThrusterLeftValve"`
 	VoltageThrusterRightValve    float32 `json:"voltageThrusterRightValve"`
-	VoltageThrusterRelieveValve  float32 `json:"voltageThrusterRelieveValve"`
 	VoltageBrakingValve          float32 `json:"voltageBrakingValve"`
-	VoltageNAP                   float32 `json:"voltageNAP"`
 	VoltageBattery               float32 `json:"voltageBattery"`
 	Orientationx                 float32 `json:"orientationx"`
 	Orientationy                 float32 `json:"orientationy"`
