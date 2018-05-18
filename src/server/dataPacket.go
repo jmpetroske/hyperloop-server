@@ -3,10 +3,10 @@ package main
 type DataPacket struct {
 	Timestamp                    uint32  `json:"timestamp"`
 	Mode                         uint32  `json:"mode"`
-	PressureThrusterTank         bool    `json:"pressureThrusterTank"`
-	PressureBrakingTank          bool    `json:"pressureBrakingTank"`
-	PressureBrakingExtend        bool    `json:"pressureBrakingExtend"`
-	PressureBrakingCompress      bool    `json:"pressureBrakingCompress"`
+	PressureThrusterTank         float32 `json:"pressureThrusterTank"`
+	PressureBrakingTank          float32 `json:"pressureBrakingTank"`
+	PressureBrakingExtend        float32 `json:"pressureBrakingExtend"`
+	PressureBrakingCompress      float32 `json:"pressureBrakingCompress"`
 	TemperatureThrusterLeftTank  float32 `json:"temperatureThrusterLeftTank"`
 	TemperatureThrusterRightTank float32 `json:"temperatureThrusterRightTank"`
 	TemperatureBraking           float32 `json:"temperatureBraking"`
