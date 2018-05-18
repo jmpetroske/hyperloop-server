@@ -81,13 +81,10 @@ func parseDataPacket(data []byte) *DataPacket {
 
 		switch field.Kind() {
 		case reflect.Uint32:
-			// TODO
 			field.SetUint(uint64(binary.LittleEndian.Uint32(dataVals[i])))
 		case reflect.Float32:
-			// TODO
 			field.SetFloat(float64(math.Float32frombits(binary.LittleEndian.Uint32(dataVals[i]))))
 		case reflect.Bool:
-			// TODO
 			noZeros := true
 			for _, b := range dataVals[i] {
 				noZeros = noZeros || b == 0
