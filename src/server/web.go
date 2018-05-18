@@ -62,6 +62,12 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
  * 5: disengageBallValves
  */
 func commandHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Add("Access-Control-Allow-Methods", "GET, PUT, POST, PATCH, DELETE")
+	w.Header().Add("Access-Control-Expose-Headers", "Authorization")
+	w.Header().Add("Access-Control-Max-Age", "600")
+	
 	if r.FormValue("command") == "" {
 		http.Error(w, "400 - missing the command parameter", http.StatusBadRequest)
 		return
@@ -79,7 +85,7 @@ func commandHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	commandChan <- &TestingCommand{TestingCommandEnum(command)}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{success: true}"))
+	w.Write([]byte(`{"success": true}`))
 }
 
 func abortHandler(w http.ResponseWriter, r *http.Request) {

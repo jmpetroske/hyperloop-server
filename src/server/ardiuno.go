@@ -17,6 +17,28 @@ const serverTCPAddress string = ":8000"
 var serverUDPAddress, _ = net.ResolveUDPAddr("udp", ":8000")
 var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8000")
 
+func debugTcpSocket() {
+	listener, err := net.Listen("tcp", serverTCPAddress)
+	if err != nil {
+		panic(err)
+	}
+	conn, err := listener.Accept()
+	if err != nil {
+		panic(err)
+	}
+	log.Println("Got TCP connection with teensy")
+	
+	// bytesRead, err := conn.Read(readBuf)
+	// log.Println(bytesRead)
+	
+	for {
+		_, err := conn.Write((<-commandChan).WriteCommand())
+		if err != nil {
+			log.Println(err)
+		}
+	}
+}
+
 func tcpSocket() {
 	// readBuf := make([]byte, 2048)
 
@@ -101,4 +123,8 @@ func parseDataPacket(data []byte) *DataPacket {
 func startArduinoComs() {
 	go udpSocket()
 	tcpSocket()
+}
+
+func startDebugArduinoComs() {
+	debugTcpSocket()
 }
