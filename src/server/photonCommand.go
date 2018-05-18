@@ -69,6 +69,15 @@ func (t *TestingCommand) WriteCommand() []byte {
 	return contents
 }
 
+type StopTestingCommand struct {
+}
+
+func (t *StopTestingCommand) WriteCommand() []byte {
+	contents := make([]byte, 4)
+	binary.LittleEndian.PutUint32(contents[0:4], GoToStandbyCommandNum)
+	return contents
+}
+
 type AbortCommand struct {
 }
 
