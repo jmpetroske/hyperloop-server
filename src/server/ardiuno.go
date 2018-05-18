@@ -27,11 +27,21 @@ func debugTcpSocket() {
 		panic(err)
 	}
 	log.Println("Got TCP connection with teensy")
-	
+
 	// bytesRead, err := conn.Read(readBuf)
 	// log.Println(bytesRead)
-	
+
 	for {
+		select {
+		case command, ok := <-commandChan:
+			if ok {
+				log.Println("Got a command: " + command.WriteCommand())
+			} else {
+				log.Println("command channel closed")
+			}
+		default:
+
+		}
 		_, err := conn.Write((<-commandChan).WriteCommand())
 		if err != nil {
 			log.Println(err)
