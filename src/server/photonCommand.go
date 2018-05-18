@@ -35,21 +35,27 @@ type MissionParamsCommand struct {
 }
 
 func (*MissionParamsCommand) WriteCommand() []byte {
-	return make([]byte, 0)
+	contents := make([]byte, 4)
+	binary.LittleEndian.PutUint32(contents[0:4], SetVariablesCommandNum)
+	return contents
 }
 
 type ArmCommand struct {
 }
 
 func (*ArmCommand) WriteCommand() []byte {
-	return make([]byte, 0)
+	contents := make([]byte, 4)
+	binary.LittleEndian.PutUint32(contents[0:4], GoToIdleCommandNum)
+	return contents
 }
 
 type StartCommand struct {
 }
 
 func (*StartCommand) WriteCommand() []byte {
-	return make([]byte, 0)
+	contents := make([]byte, 4)
+	binary.LittleEndian.PutUint32(contents[0:4], GoToAcceleratingCommandNum)
+	return contents
 }
 
 type TestingCommand struct {
