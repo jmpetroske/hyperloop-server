@@ -83,6 +83,8 @@ func commandHandler(w http.ResponseWriter, r *http.Request) {
 			http.StatusBadRequest)
 		return
 	}
+	// log.Println("Got a command: " +
+	// string((&TestingCommand{TestingCommandEnum(command)}).WriteCommand()))
 	commandChan <- &TestingCommand{TestingCommandEnum(command)}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"success": true}`))

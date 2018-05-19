@@ -64,8 +64,8 @@ type TestingCommand struct {
 
 func (t *TestingCommand) WriteCommand() []byte {
 	contents := make([]byte, 8)
-	binary.LittleEndian.PutUint32(contents[0:4], TestingCommandNum)
-	binary.LittleEndian.PutUint32(contents[5:8], uint32(t.TestCommand))
+	binary.LittleEndian.PutUint32(contents[0:], TestingCommandNum)
+	binary.LittleEndian.PutUint32(contents[4:], uint32(t.TestCommand))
 	return contents
 }
 

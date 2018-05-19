@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"sync"
 )
 
@@ -17,8 +18,10 @@ func main() {
 
 	go startWebServer()
 	if *debug {
+		log.Println("Using debug mode. (For this weekend)")
 		startDebugArduinoComs()
 	} else if *testing {
+		log.Println("Using testing mode. (For vincent")
 		startFakeArduino()
 	} else {
 		startArduinoComs()

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 	"log"
 	"math"
 	"net"
@@ -12,10 +13,10 @@ import (
 const SEND_RATIO = 100 // Send 1 in 100 packets
 const UDP_MAX_PACKET_SIZE int = 2048
 
-const serverTCPAddress string = ":8000"
+const serverTCPAddress string = ":8888"
 
-var serverUDPAddress, _ = net.ResolveUDPAddr("udp", ":8000")
-var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8000")
+var serverUDPAddress, _ = net.ResolveUDPAddr("udp", ":8888")
+var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8888")
 
 func debugTcpSocket() {
 	listener, err := net.Listen("tcp", serverTCPAddress)
@@ -26,32 +27,38 @@ func debugTcpSocket() {
 	if err != nil {
 		panic(err)
 	}
-	log.Println("Got TCP connection with teensy")
+	log.Println("Got TCP connection with teensy for testing")
 
 	// bytesRead, err := conn.Read(readBuf)
 	// log.Println(bytesRead)
 
-	for {
-		select {
-		case command, ok := <-commandChan:
-			if ok {
-				log.Println("Got a command: " + command.WriteCommand())
-			} else {
-				log.Println("command channel closed")
+	go func() {
+		for {
+			_, err := conn.Write((<-commandChan).WriteCommand())
+			log.Println("Got a command")
+			if err != nil {
+				log.Println(err)
 			}
-		default:
-
 		}
-		_, err := conn.Write((<-commandChan).WriteCommand())
+	}()
+
+	for {
+		dp, err := tcpDataPacketParser(conn)
 		if err != nil {
 			log.Println(err)
+			continue
 		}
+		logDataPacket(dp)
+		latestDataMutex.Lock()
+		latestData = dp
+		latestDataMutex.Unlock()
+		// log.Print("Got a data packet")
+		// log.Println(dp)
 	}
 }
 
 func tcpSocket() {
 	// readBuf := make([]byte, 2048)
-
 	listener, err := net.Listen("tcp", serverTCPAddress)
 	if err != nil {
 		panic(err)
@@ -128,6 +135,48 @@ func parseDataPacket(data []byte) *DataPacket {
 	}
 
 	return &retval
+}
+
+func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {
+	retval := DataPacket{}
+	reflectValue := reflect.ValueOf(&retval).Elem()
+	for i := 0; i < reflectValue.NumField(); i++ {
+		field := reflectValue.Field(i)
+
+		switch field.Kind() {
+		case reflect.Uint32:
+			b := make([]byte, 4)
+			_, err := io.ReadFull(conn, b)
+			if err != nil {
+				log.Print("Parsing error: ")
+				log.Println(err)
+				return nil, err
+			}
+			field.SetUint(uint64(binary.LittleEndian.Uint32(b)))
+		case reflect.Float32:
+			b := make([]byte, 4)
+			_, err := io.ReadFull(conn, b)
+			if err != nil {
+				log.Print("Parsing error: ")
+				log.Println(err)
+				return nil, err
+			}
+			field.SetFloat(float64(math.Float32frombits(binary.LittleEndian.Uint32(b))))
+		case reflect.Bool:
+			b := make([]byte, 1)
+			_, err := io.ReadFull(conn, b)
+			if err != nil {
+				log.Print("Parsing error: ")
+				log.Println(err)
+				return nil, err
+			}
+			field.SetBool(b[0] != 0)
+		default:
+			log.Println("Error parsing data from teensy, bad use of reflection")
+		}
+	}
+
+	return &retval, nil
 }
 
 func startArduinoComs() {
