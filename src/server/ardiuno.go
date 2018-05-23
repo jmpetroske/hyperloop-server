@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/binary"
 	"io"
 	"log"
@@ -13,13 +12,13 @@ import (
 const SEND_RATIO = 100 // Send 1 in 100 packets
 const UDP_MAX_PACKET_SIZE int = 2048
 
-const serverTCPAddress string = ":8888"
+const serverAddress string = "0.0.0.0:8888"
 
-var serverUDPAddress, _ = net.ResolveUDPAddr("udp", ":8888")
+var serverUDPAddress, _ = net.ResolveUDPAddr("udp", serverAddress)
 var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8888")
 
 func debugTcpSocket() {
-	listener, err := net.Listen("tcp", serverTCPAddress)
+	listener, err := net.Listen("tcp", serverAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -48,18 +47,16 @@ func debugTcpSocket() {
 			log.Println(err)
 			continue
 		}
-		logDataPacket(dp)
 		latestDataMutex.Lock()
 		latestData = dp
 		latestDataMutex.Unlock()
-		// log.Print("Got a data packet")
-		// log.Println(dp)
+		logDataPacket(dp)
 	}
 }
 
 func tcpSocket() {
 	// readBuf := make([]byte, 2048)
-	listener, err := net.Listen("tcp", serverTCPAddress)
+	listener, err := net.Listen("tcp", serverAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -86,8 +83,15 @@ func udpSocket() {
 	if err != nil {
 		panic(err)
 	}
+
+	go func() {
+		<-abortChan
+		for {
+			udpConn.WriteToUdp([] TODO, teensyUDPAddress)
+		}
+	}()
+	
 	buf := make([]byte, UDP_MAX_PACKET_SIZE)
-	numSent := 0
 	for {
 		n, senderAddr, err := udpConn.ReadFromUDP(buf)
 		if err != nil {
@@ -106,35 +110,7 @@ func udpSocket() {
 		latestDataMutex.Lock()
 		latestData = dataPacket
 		latestDataMutex.Unlock()
-
-		numSent++
 	}
-}
-
-func parseDataPacket(data []byte) *DataPacket {
-	dataVals := bytes.Split(data, []byte{','})
-	retval := DataPacket{}
-	reflectValue := reflect.ValueOf(&retval).Elem()
-	for i := 0; i < reflectValue.NumField(); i++ {
-		field := reflectValue.Field(i)
-
-		switch field.Kind() {
-		case reflect.Uint32:
-			field.SetUint(uint64(binary.LittleEndian.Uint32(dataVals[i])))
-		case reflect.Float32:
-			field.SetFloat(float64(math.Float32frombits(binary.LittleEndian.Uint32(dataVals[i]))))
-		case reflect.Bool:
-			noZeros := true
-			for _, b := range dataVals[i] {
-				noZeros = noZeros || b == 0
-			}
-			field.SetBool(noZeros)
-		default:
-			log.Println("Error parsing data from teensy, bad use of reflection")
-		}
-	}
-
-	return &retval
 }
 
 func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {

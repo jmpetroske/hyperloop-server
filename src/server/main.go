@@ -9,6 +9,7 @@ import (
 var latestDataMutex = &sync.Mutex{}
 var latestData *DataPacket
 var commandChan = make(chan PhotonCommand, 20)
+var abortChan = make(chan struct{}, 5)
 
 func main() {
 	var testing *bool = flag.Bool("testing", false, "set to use testing mode")
@@ -26,4 +27,5 @@ func main() {
 	} else {
 		startArduinoComs()
 	}
+	for {}
 }
