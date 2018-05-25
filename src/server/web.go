@@ -70,7 +70,7 @@ func commandHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "400 - invalid command parameter. Pass an int", http.StatusBadRequest)
 		return
 	}
-	if command < 0 || command > 5 {
+	if command < 0 || command > 7 {
 		http.Error(w, "400 - invalid command parameter, not in the valid range of values",
 			http.StatusBadRequest)
 		return
