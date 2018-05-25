@@ -16,12 +16,14 @@ const (
 )
 
 const (
-	EngageBreaks        TestingCommandEnum = 0
-	DisengageBreaks     TestingCommandEnum = 1
-	EngageSolenoids     TestingCommandEnum = 2
-	DisengageSolenoids  TestingCommandEnum = 3
-	EngageBallValves    TestingCommandEnum = 4
-	DisengageBallValves TestingCommandEnum = 5
+	EngageBreaks      TestingCommandEnum = 0
+	DisengageBreaks   TestingCommandEnum = 1
+	OpenThruster      TestingCommandEnum = 2
+	CloseThruster     TestingCommandEnum = 3
+	OpenBallValves    TestingCommandEnum = 4
+	CloseBallValves   TestingCommandEnum = 5
+	OpenReleaseValve  TestingCommandEnum = 6
+	CloseReleaseValve TestingCommandEnum = 7
 )
 
 type PhotonCommand interface {

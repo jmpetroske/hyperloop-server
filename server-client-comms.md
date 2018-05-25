@@ -15,14 +15,16 @@ Set 3 variables, all in float format: `distance`, `pressure`, and `topSpeed`.
 ## God mode commands
 Set the `command` variable to a value between 0 and 5.
 
-| Value | Meaning             |
-|-------|---------------------|
-| 0     | engageBreaks        |
-| 1     | disengageBreaks     |
-| 2     | engageSolenoids     |
-| 3     | disengageSolenoids  |
-| 4     | engageBallValves    |
-| 5     | disengageBallValves |
+| Value | Meaning           |
+|-------|-------------------|
+| 0     | EngageBreaks      |
+| 1     | DisengageBreaks   |
+| 2     | OpenThruster      |
+| 3     | CloseThruster     |
+| 4     | OpenBallValves    |
+| 5     | CloseBallValves   |
+| 6     | OpenReleaseValve  |
+| 7     | CloseReleaseValve |
 
 ## Example websocket data
 ```javascript

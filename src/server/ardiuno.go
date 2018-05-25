@@ -22,95 +22,106 @@ func debugTcpSocket() {
 	if err != nil {
 		panic(err)
 	}
-	conn, err := listener.Accept()
-	if err != nil {
-		panic(err)
-	}
-	log.Println("Got TCP connection with teensy for testing")
-
-	// bytesRead, err := conn.Read(readBuf)
-	// log.Println(bytesRead)
-
-	go func() {
-		for {
-			_, err := conn.Write((<-commandChan).WriteCommand())
-			log.Println("Got a command")
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	}()
-
-	for {
-		dp, err := tcpDataPacketParser(conn)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		latestDataMutex.Lock()
-		latestData = dp
-		latestDataMutex.Unlock()
-		logDataPacket(dp)
-	}
-}
-
-func tcpSocket() {
-	// readBuf := make([]byte, 2048)
-	listener, err := net.Listen("tcp", serverAddress)
-	if err != nil {
-		panic(err)
-	}
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			panic(err)
 		}
-		// TODO check that this is a connection to the teensy
-		log.Println("Got TCP connection with teensy")
+		log.Println("Got TCP connection with teensy for testing")
+
 		// bytesRead, err := conn.Read(readBuf)
 		// log.Println(bytesRead)
-		for {
-			_, err := conn.Write((<-commandChan).WriteCommand())
-			if err != nil {
-				log.Println(err)
+
+		go func() {
+			for {
+				_, err := conn.Write((<-commandChan).WriteCommand())
+				log.Println("Got a command in arduino coms, sending to teensy")
+				if err != nil {
+					log.Print("Parsing error: ")
+					log.Println(err)
+					log.Println("Closing connection with teensy")
+					conn.Close()
+					return
+				}
 			}
+		}()
+
+		for {
+			dp, err := tcpDataPacketParser(conn)
+			if err != nil {
+				log.Print("Parsing error: ")
+				log.Println(err)
+				log.Println("Closing connection with teensy")
+				conn.Close()
+				return
+			}
+			latestDataMutex.Lock()
+			latestData = dp
+			latestDataMutex.Unlock()
+			go logDataPacket(dp)
 		}
 	}
 }
 
+func tcpSocket() {
+	log.Println("ERROR: don't use this mode")
+	// // readBuf := make([]byte, 2048)
+	// listener, err := net.Listen("tcp", serverAddress)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// for {
+	// 	conn, err := listener.Accept()
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	// TODO check that this is a connection to the teensy
+	// 	log.Println("Got TCP connection with teensy")
+	// 	// bytesRead, err := conn.Read(readBuf)
+	// 	// log.Println(bytesRead)
+	// 	for {
+	// 		_, err := conn.Write((<-commandChan).WriteCommand())
+	// 		if err != nil {
+	// 			log.Println(err)
+	// 		}
+	// 	}
+	// }
+}
+
 func udpSocket() {
-	udpConn, err := net.ListenUDP("udp", serverUDPAddress)
-	if err != nil {
-		panic(err)
-	}
+	log.Println("ERROR: don't use this mode")
+	// udpConn, err := net.ListenUDP("udp", serverUDPAddress)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	go func() {
-		<-abortChan
-		for {
-			udpConn.WriteToUdp([] TODO, teensyUDPAddress)
-		}
-	}()
-	
-	buf := make([]byte, UDP_MAX_PACKET_SIZE)
-	for {
-		n, senderAddr, err := udpConn.ReadFromUDP(buf)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		if !senderAddr.IP.Equal(teensyUDPAddress.IP) ||
-			senderAddr.Port != teensyUDPAddress.Port {
-			log.Println("Got UDP packet from non teensy address")
-			continue
-		}
+	// go func() {
+	// 	<-abortChan
+	// 	for {
+	// 		udpConn.WriteToUdp([] TODO, teensyUDPAddress)
+	// 	}
+	// }()
 
-		log.Println("Got UDP packet from teensy: " + string(buf[0:n]))
-		dataPacket := parseDataPacket(buf[0:n])
-		logDataPacket(dataPacket)
-		latestDataMutex.Lock()
-		latestData = dataPacket
-		latestDataMutex.Unlock()
-	}
+	// buf := make([]byte, UDP_MAX_PACKET_SIZE)
+	// for {
+	// 	n, senderAddr, err := udpConn.ReadFromUDP(buf)
+	// 	if err != nil {
+	// 		log.Println(err)
+	// 		continue
+	// 	}
+	// 	if !senderAddr.IP.Equal(teensyUDPAddress.IP) ||
+	// 		senderAddr.Port != teensyUDPAddress.Port {
+	// 		log.Println("Got UDP packet from non teensy address")
+	// 		continue
+	// 	}
+
+	// 	log.Println("Got UDP packet from teensy: " + string(buf[0:n]))
+	// 	dataPacket := parseDataPacket(buf[0:n])
+	// 	logDataPacket(dataPacket)
+	// 	latestDataMutex.Lock()
+	// 	latestData = dataPacket
+	// 	latestDataMutex.Unlock()
+	// }
 }
 
 func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {
@@ -124,8 +135,6 @@ func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {
 			b := make([]byte, 4)
 			_, err := io.ReadFull(conn, b)
 			if err != nil {
-				log.Print("Parsing error: ")
-				log.Println(err)
 				return nil, err
 			}
 			field.SetUint(uint64(binary.LittleEndian.Uint32(b)))
@@ -133,8 +142,6 @@ func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {
 			b := make([]byte, 4)
 			_, err := io.ReadFull(conn, b)
 			if err != nil {
-				log.Print("Parsing error: ")
-				log.Println(err)
 				return nil, err
 			}
 			field.SetFloat(float64(math.Float32frombits(binary.LittleEndian.Uint32(b))))
@@ -142,13 +149,11 @@ func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {
 			b := make([]byte, 1)
 			_, err := io.ReadFull(conn, b)
 			if err != nil {
-				log.Print("Parsing error: ")
-				log.Println(err)
 				return nil, err
 			}
 			field.SetBool(b[0] != 0)
 		default:
-			log.Println("Error parsing data from teensy, bad use of reflection")
+			log.Fatal("Error parsing data from teensy, bad use of reflection")
 		}
 	}
 
