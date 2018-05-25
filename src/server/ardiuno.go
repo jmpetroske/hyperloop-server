@@ -58,7 +58,6 @@ func debugTcpSocket() {
 			latestDataMutex.Lock()
 			latestData = dp
 			latestDataMutex.Unlock()
-			go logDataPacket(dp)
 		}
 	}
 }

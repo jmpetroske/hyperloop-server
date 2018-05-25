@@ -1,12 +1,17 @@
 package main
 
-var currDataPacket *DataPacket
+import (
+	"fmt"
+	"time"
+)
 
-func logDataPacket(dp *DataPacket) {
-	currDataPacket = dp
-	// TODO actually log it somewhere and keep old data
-}
+const logRate = 1
 
-func getMostRecentData(retDataPacket *DataPacket) {
-	*retDataPacket = *currDataPacket
+func startLogger() {
+	for {
+		latestDataMutex.Lock()
+		fmt.Println(*latestData)
+		latestDataMutex.Unlock()
+		time.Sleep(logRate * time.Second)
+	}
 }
