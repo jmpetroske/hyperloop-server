@@ -18,18 +18,31 @@ func main() {
 	var printData *bool = flag.Bool("log-data", false, "set to use log data as it comes in");
 	flag.Parse()
 
-	go startWebServer()
-	if *debug {
-		log.Println("Using debug mode. (For this weekend)")
-		go startDebugArduinoComs()
-	} else if *testing {
-		log.Println("Using testing mode. (For vincent")
-		go startFakeArduino()
-	} else {
-		go startArduinoComs()
-	}
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		startWebServer()
+		wg.Done()
+	}()
+	
+	wg.Add(1)
+	go func() {
+		if *debug {
+			log.Println("Using debug mode. (For this weekend)")
+			startDebugArduinoComs()
+		} else if *testing {
+			log.Println("Using testing mode. (For vincent")
+			startFakeArduino()
+		} else {
+			startArduinoComs()
+		}
+		wg.Done()
+	}()
+
 	if *printData {
 		go startLogger()
 	}
-	for {}
+
+	wg.Wait()
 }

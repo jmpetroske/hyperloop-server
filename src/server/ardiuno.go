@@ -12,7 +12,7 @@ import (
 const SEND_RATIO = 100 // Send 1 in 100 packets
 const UDP_MAX_PACKET_SIZE int = 2048
 
-const serverAddress string = "0.0.0.0:8888"
+const serverAddress string = ":8888"
 
 var serverUDPAddress, _ = net.ResolveUDPAddr("udp", serverAddress)
 var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8888")
@@ -22,32 +22,21 @@ func debugTcpSocket() {
 	if err != nil {
 		panic(err)
 	}
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			panic(err)
-		}
-		log.Println("Got TCP connection with teensy for testing")
+	
+	log.Println("Wating for connection with teensy")
+	conn, err := listener.Accept()
+	if err != nil {
+		panic(err)
+	}
+	log.Println("Got TCP connection with teensy for testing")
 
-		// bytesRead, err := conn.Read(readBuf)
-		// log.Println(bytesRead)
+	// bytesRead, err := conn.Read(readBuf)
+	// log.Println(bytesRead)
 
-		go func() {
-			for {
-				_, err := conn.Write((<-commandChan).WriteCommand())
-				log.Println("Got a command in arduino coms, sending to teensy")
-				if err != nil {
-					log.Print("Parsing error: ")
-					log.Println(err)
-					log.Println("Closing connection with teensy")
-					conn.Close()
-					return
-				}
-			}
-		}()
-
+	go func() {
 		for {
-			dp, err := tcpDataPacketParser(conn)
+			_, err := conn.Write((<-commandChan).WriteCommand())
+			log.Println("Got a command in arduino coms, sending to teensy")
 			if err != nil {
 				log.Print("Parsing error: ")
 				log.Println(err)
@@ -55,10 +44,22 @@ func debugTcpSocket() {
 				conn.Close()
 				return
 			}
-			latestDataMutex.Lock()
-			latestData = dp
-			latestDataMutex.Unlock()
 		}
+	}()
+
+	for {
+		dp, err := tcpDataPacketParser(conn)
+		if err != nil {
+			log.Print("Parsing error: ")
+			log.Println(err)
+			log.Println("Closing connection with teensy")
+			conn.Close()
+			break
+		}
+		log.Println("Got a packet")
+		latestDataMutex.Lock()
+		latestData = dp
+		latestDataMutex.Unlock()
 	}
 }
 
