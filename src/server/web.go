@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"log"
@@ -11,7 +12,17 @@ import (
 
 const webServerAddress string = ":8080"
 
+func allowCrossOrigin(w http.ResponseWriter) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Add("Access-Control-Allow-Methods", "POST")
+	w.Header().Add("Access-Control-Expose-Headers", "Authorization")
+	w.Header().Add("Access-Control-Max-Age", "600")
+}
+
 func missionHandler(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w)
+
 	if r.FormValue("distance") == "" ||
 		r.FormValue("pressure") == "" ||
 		r.FormValue("topSpeed") == "" {
@@ -31,22 +42,34 @@ func missionHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{success: true}"))
+
 	commandChan <- &MissionParamsCommand{
 		Distance: float32(distance),
 		Pressure: float32(pressure),
 		TopSpeed: float32(topSpeed),
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{success: true}"))
+	
+	// log.Println("Got command: " + fmt.Sprintf("%+v" ,MissionParamsCommand{
+	// 	Distance: float32(distance),
+	// 	Pressure: float32(pressure),
+	// 	TopSpeed: float32(topSpeed),
+	// }))
 }
 
 func armHandler(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w)
+
 	commandChan <- &ArmCommand{}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("{success: true}"))
 }
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w)
+
 	commandChan <- &StartCommand{}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("{success: true}"))
@@ -54,11 +77,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 
 // see photonCommand.go for command values
 func commandHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	w.Header().Add("Access-Control-Allow-Methods", "POST")
-	w.Header().Add("Access-Control-Expose-Headers", "Authorization")
-	w.Header().Add("Access-Control-Max-Age", "600")
+	allowCrossOrigin(w)
 
 	if r.FormValue("command") == "" {
 		http.Error(w, "400 - missing the command parameter", http.StatusBadRequest)
@@ -82,6 +101,8 @@ func commandHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func abortHandler(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w)
+
 	commandChan <- &AbortCommand{}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("{success: true}"))
