@@ -12,10 +12,9 @@ var commandChan = make(chan PhotonCommand, 20)
 var abortChan = make(chan struct{}, 5)
 
 func main() {
-	var testing *bool = flag.Bool("testing", false, "set to use testing mode")
-	var debug *bool = flag.Bool("debug", false, "set to use debug mode. Debug mode lets you "+
-		"communicate with the teensly solely over TCP for this weekends test event")
-	var printData *bool = flag.Bool("log-data", false, "set to use log data as it comes in");
+	var tcpOnly *bool = flag.Bool("tcp-only", false, "Use tcp for all communications")
+	var logData *bool = flag.Bool("log-data", false,
+		"Log data as it comes in from the teensy. Data will be printed to stdout")
 	flag.Parse()
 
 	var wg sync.WaitGroup
@@ -25,22 +24,21 @@ func main() {
 		startWebServer()
 		wg.Done()
 	}()
-	
+
 	wg.Add(1)
 	go func() {
-		if *debug {
-			log.Println("Using debug mode. (For this weekend)")
-			startDebugArduinoComs()
-		} else if *testing {
-			log.Println("Using testing mode. (For vincent")
-			startFakeArduino()
+		if *tcpOnly {
+			log.Println("Using only tcp for communications")
+			tcpComs(true)
 		} else {
-			startArduinoComs()
+			go udpSocket()
+			log.Println("Using TCP and UDP for communications")
+			tcpComs(false)
 		}
 		wg.Done()
 	}()
 
-	if *printData {
+	if *logData {
 		go startLogger()
 	}
 

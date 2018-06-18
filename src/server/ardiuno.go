@@ -17,114 +17,79 @@ const serverAddress string = ":8888"
 var serverUDPAddress, _ = net.ResolveUDPAddr("udp", serverAddress)
 var teensyUDPAddress, _ = net.ResolveUDPAddr("udp", "192.168.1.100:8888")
 
-func debugTcpSocket() {
+// readData: if true, read DataPackets from the TCP connection
+func tcpComs(readData bool) {
 	listener, err := net.Listen("tcp", serverAddress)
 	if err != nil {
 		panic(err)
 	}
-	
-	log.Println("Wating for connection with teensy")
+
+	log.Println("Waiting for connection with teensy")
 	conn, err := listener.Accept()
 	if err != nil {
 		panic(err)
 	}
 	log.Println("Got TCP connection with teensy for testing")
 
-	// bytesRead, err := conn.Read(readBuf)
-	// log.Println(bytesRead)
+	if readData {
+		// goroutine that reads DataPackets from the connection
+		go func() {
+			for {
+				dp, err := getDataPacket(conn)
+				if err != nil {
+					log.Print("Parsing error: ")
+					log.Println(err)
+					log.Println("Closing connection with teensy")
+					conn.Close()
+					break
+				}
+				log.Println("Got a packet")
+				latestDataMutex.Lock()
+				latestData = dp
+				latestDataMutex.Unlock()
+			}
+		}()
+	}
+
+	// send commands to the teensy
+	for {
+		log.Println("Sending command to teensy")
+		_, err := conn.Write((<-commandChan).WriteCommand())
+		if err != nil {
+			log.Print("Error sending command to teensy: ")
+			log.Println(err)
+			log.Println("Closing connection with teensy")
+			conn.Close()
+			return
+		}
+	}
+}
+
+func udpSocket() {
+	udpConn, err := net.ListenUDP("udp", serverUDPAddress)
+	if err != nil {
+		panic(err)
+	}
 
 	go func() {
+		<-abortChan
 		for {
-			_, err := conn.Write((<-commandChan).WriteCommand())
-			log.Println("Got a command in arduino coms, sending to teensy")
-			if err != nil {
-				log.Print("Parsing error: ")
-				log.Println(err)
-				log.Println("Closing connection with teensy")
-				conn.Close()
-				return
-			}
+			udpConn.WriteToUDP([]byte("ABORT"), teensyUDPAddress)
 		}
 	}()
 
 	for {
-		dp, err := tcpDataPacketParser(conn)
+		dataPacket, err := getDataPacket(udpConn)
 		if err != nil {
-			log.Print("Parsing error: ")
-			log.Println(err)
-			log.Println("Closing connection with teensy")
-			conn.Close()
-			break
+
 		}
-		log.Println("Got a packet")
 		latestDataMutex.Lock()
-		latestData = dp
+		latestData = dataPacket
 		latestDataMutex.Unlock()
 	}
 }
 
-func tcpSocket() {
-	log.Println("ERROR: don't use this mode")
-	// // readBuf := make([]byte, 2048)
-	// listener, err := net.Listen("tcp", serverAddress)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// for {
-	// 	conn, err := listener.Accept()
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	// TODO check that this is a connection to the teensy
-	// 	log.Println("Got TCP connection with teensy")
-	// 	// bytesRead, err := conn.Read(readBuf)
-	// 	// log.Println(bytesRead)
-	// 	for {
-	// 		_, err := conn.Write((<-commandChan).WriteCommand())
-	// 		if err != nil {
-	// 			log.Println(err)
-	// 		}
-	// 	}
-	// }
-}
-
-func udpSocket() {
-	log.Println("ERROR: don't use this mode")
-	// udpConn, err := net.ListenUDP("udp", serverUDPAddress)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// go func() {
-	// 	<-abortChan
-	// 	for {
-	// 		udpConn.WriteToUdp([] TODO, teensyUDPAddress)
-	// 	}
-	// }()
-
-	// buf := make([]byte, UDP_MAX_PACKET_SIZE)
-	// for {
-	// 	n, senderAddr, err := udpConn.ReadFromUDP(buf)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 		continue
-	// 	}
-	// 	if !senderAddr.IP.Equal(teensyUDPAddress.IP) ||
-	// 		senderAddr.Port != teensyUDPAddress.Port {
-	// 		log.Println("Got UDP packet from non teensy address")
-	// 		continue
-	// 	}
-
-	// 	log.Println("Got UDP packet from teensy: " + string(buf[0:n]))
-	// 	dataPacket := parseDataPacket(buf[0:n])
-	// 	logDataPacket(dataPacket)
-	// 	latestDataMutex.Lock()
-	// 	latestData = dataPacket
-	// 	latestDataMutex.Unlock()
-	// }
-}
-
-func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {
+func getDataPacket(conn net.Conn) (*DataPacket, error) {
 	retval := DataPacket{}
 	reflectValue := reflect.ValueOf(&retval).Elem()
 	for i := 0; i < reflectValue.NumField(); i++ {
@@ -158,13 +123,4 @@ func tcpDataPacketParser(conn net.Conn) (*DataPacket, error) {
 	}
 
 	return &retval, nil
-}
-
-func startArduinoComs() {
-	go udpSocket()
-	tcpSocket()
-}
-
-func startDebugArduinoComs() {
-	debugTcpSocket()
 }
