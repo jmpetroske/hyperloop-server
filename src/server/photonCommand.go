@@ -9,11 +9,10 @@ type TestingCommandEnum uint32
 
 const (
 	SetVariablesCommandNum     uint32 = 0
-	GoToTestingCommandNum      uint32 = 1
-	GoToStandbyCommandNum      uint32 = 2
-	TestingCommandNum          uint32 = 3
-	GoToIdleCommandNum         uint32 = 4
-	GoToAcceleratingCommandNum uint32 = 5
+	GoToIdleCommandNum         uint32 = 1
+	GoToArmedCommandNum        uint32 = 2
+	GoToAcceleratingCommandNum uint32 = 3
+	TestingCommandNum          uint32 = 4
 )
 
 const (
@@ -46,12 +45,21 @@ func (c *MissionParamsCommand) WriteCommand() []byte {
 	return contents
 }
 
+type GoToIdleCommand struct {
+}
+
+func (*GoToIdleCommand) WriteCommand() []byte {
+	contents := make([]byte, 4)
+	binary.LittleEndian.PutUint32(contents[0:4], GoToIdleCommandNum)
+	return contents
+}
+
 type ArmCommand struct {
 }
 
 func (*ArmCommand) WriteCommand() []byte {
 	contents := make([]byte, 4)
-	binary.LittleEndian.PutUint32(contents[0:4], GoToIdleCommandNum)
+	binary.LittleEndian.PutUint32(contents[0:4], GoToArmedCommandNum)
 	return contents
 }
 
@@ -75,18 +83,9 @@ func (t *TestingCommand) WriteCommand() []byte {
 	return contents
 }
 
-type StopTestingCommand struct {
-}
-
-func (t *StopTestingCommand) WriteCommand() []byte {
-	contents := make([]byte, 4)
-	binary.LittleEndian.PutUint32(contents[0:4], GoToStandbyCommandNum)
-	return contents
-}
-
 type AbortCommand struct {
 }
 
 func (*AbortCommand) WriteCommand() []byte {
-	return make([]byte, 0)
+	return make([]byte, 1)
 }

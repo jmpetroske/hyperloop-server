@@ -58,6 +58,14 @@ func missionHandler(w http.ResponseWriter, r *http.Request) {
 	// }))
 }
 
+func goToIdleHandler(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w)
+
+	commandChan <- &GoToIdleCommand{}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{success: true}"))
+}
+
 func armHandler(w http.ResponseWriter, r *http.Request) {
 	allowCrossOrigin(w)
 
@@ -75,7 +83,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // see photonCommand.go for command values
-func commandHandler(w http.ResponseWriter, r *http.Request) {
+func testCommandHandler(w http.ResponseWriter, r *http.Request) {
 	allowCrossOrigin(w)
 
 	if r.FormValue("command") == "" {
@@ -140,9 +148,10 @@ func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 func startWebServer() {
 	router := mux.NewRouter()
 	router.HandleFunc("/mission", missionHandler).Methods("POST")
+	router.HandleFunc("/goToIdle", goToIdleHandler).Methods("POST")
 	router.HandleFunc("/arm", armHandler).Methods("POST")
 	router.HandleFunc("/start", startHandler).Methods("POST")
-	router.HandleFunc("/command", commandHandler).Methods("POST")
+	router.HandleFunc("/testCommand", testCommandHandler).Methods("POST")
 	router.HandleFunc("/abort", abortHandler).Methods("POST")
 	router.HandleFunc("/dataWebSocket", serveWebSocket)
 	http.Handle("/", router)
