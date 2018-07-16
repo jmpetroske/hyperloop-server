@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"math"
 )
 
 type TestingCommandEnum uint32
@@ -36,9 +37,12 @@ type MissionParamsCommand struct {
 	TopSpeed float32
 }
 
-func (*MissionParamsCommand) WriteCommand() []byte {
-	contents := make([]byte, 4)
+func (c *MissionParamsCommand) WriteCommand() []byte {
+	contents := make([]byte, 16)
 	binary.LittleEndian.PutUint32(contents[0:4], SetVariablesCommandNum)
+	binary.LittleEndian.PutUint32(contents[4:8], math.Float32bits(c.Distance))
+	binary.LittleEndian.PutUint32(contents[8:12], math.Float32bits(c.Pressure))
+	binary.LittleEndian.PutUint32(contents[12:16], math.Float32bits(c.TopSpeed))
 	return contents
 }
 
