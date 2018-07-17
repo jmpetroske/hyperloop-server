@@ -29,7 +29,7 @@ func tcpComs(readData bool) {
 	if err != nil {
 		panic(err)
 	}
-	log.Println("Got TCP connection with teensy for testing")
+	log.Println("Got TCP connection with teensy")
 
 	if readData {
 		// goroutine that reads DataPackets from the connection
@@ -53,7 +53,7 @@ func tcpComs(readData bool) {
 
 	// send commands to the teensy
 	for {
-		PhotonCommand c := <- commandChan;
+		c := <- commandChan
 		log.Println("Got command from the web client. Sending to teensy")
 		_, err := conn.Write(c.WriteCommand())
 		if err != nil {
