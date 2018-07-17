@@ -20,7 +20,7 @@ type DataPacket struct {
 	CurrentRelief      float32 `json:"currentRelief"`
 	CurrentBraking     float32 `json:"currentBraking"`
 	CurrentBattery     float32 `json:"currentBattery"`
-	VoltageBallValves  float32 `json:"voltageBallValves"`
+	VoltageBallValve   float32 `json:"voltageBallValve"`
 	VoltageRelief      float32 `json:"voltageRelief"`
 	VoltageBraking     float32 `json:"voltageBraking"`
 	VoltageBattery     float32 `json:"voltageBattery"`
