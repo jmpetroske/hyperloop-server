@@ -53,8 +53,9 @@ func tcpComs(readData bool) {
 
 	// send commands to the teensy
 	for {
-		log.Println("Sending command to teensy")
-		_, err := conn.Write((<-commandChan).WriteCommand())
+		PhotonCommand c := <- commandChan;
+		log.Println("Got command from the web client. Sending to teensy")
+		_, err := conn.Write(c.WriteCommand())
 		if err != nil {
 			log.Print("Error sending command to teensy: ")
 			log.Println(err)
