@@ -43,14 +43,14 @@ func missionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{success: true}"))
+	w.Write([]byte(`{"success": true}`))
 
 	commandChan <- &MissionParamsCommand{
 		Distance: float32(distance),
 		Pressure: float32(pressure),
 		TopSpeed: float32(topSpeed),
 	}
-	
+
 	// log.Println("Got command: " + fmt.Sprintf("%+v" ,MissionParamsCommand{
 	// 	Distance: float32(distance),
 	// 	Pressure: float32(pressure),
@@ -63,7 +63,7 @@ func goToIdleHandler(w http.ResponseWriter, r *http.Request) {
 
 	commandChan <- &GoToIdleCommand{}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{success: true}"))
+	w.Write([]byte(`{"success": true}`))
 }
 
 func armHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +71,7 @@ func armHandler(w http.ResponseWriter, r *http.Request) {
 
 	commandChan <- &ArmCommand{}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{success: true}"))
+	w.Write([]byte(`{"success": true}`))
 }
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +79,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 
 	commandChan <- &StartCommand{}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{success: true}"))
+	w.Write([]byte(`{"success": true}`))
 }
 
 // see photonCommand.go for command values
@@ -112,7 +112,7 @@ func abortHandler(w http.ResponseWriter, r *http.Request) {
 
 	commandChan <- &AbortCommand{}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{success: true}"))
+	w.Write([]byte(`{"success": true}`))
 }
 
 var upgrader = websocket.Upgrader{

@@ -33,6 +33,7 @@ func tcpComs(readData bool) {
 
 	if readData {
 		// goroutine that reads DataPackets from the connection
+		log.Println("Server will try to get data from the teensy over TCP")
 		go func() {
 			for {
 				dp, err := getDataPacket(conn)
@@ -53,7 +54,7 @@ func tcpComs(readData bool) {
 
 	// send commands to the teensy
 	for {
-		c := <- commandChan
+		c := <-commandChan
 		log.Println("Got command from the web client. Sending to teensy")
 		_, err := conn.Write(c.WriteCommand())
 		if err != nil {
