@@ -81,28 +81,58 @@ func udpSocket() {
 	}()
 
 	for {
-		dataPacket, err := getDataPacket(udpConn)
+		// dataPacket, err := getDataPacket(udpConn)
 
-		// recvbuf := make([]byte, 512)
-		// numBytes, srcAddr, err := udpConn.ReadFromUDP(recvbuf)
+		log.Println("Waiting for UDP packet")
+		recvbuf := make([]byte, 512)
+		numBytes, _, err := udpConn.ReadFromUDP(recvbuf)
 		if err != nil {
 			log.Print("Error receiving udp packet: ")
 			log.Println(err)
 			continue
 		}
+		if numBytes != 33*4 + 5 {
+			log.Println("Received packet is the wrong length")
+		}
+		dataPacket := parseUDPdataPacket(recvbuf)
+		
 		latestDataMutex.Lock()
 		latestData = dataPacket
 		latestDataMutex.Unlock()
 	}
 }
 
-// func getPacketFromUDP(
+func parseUDPdataPacket(data []byte) *DataPacket {
+	retval := DataPacket{}
+	
+	curByte := 0
+	reflectValue := reflect.ValueOf(&retval).Elem()
+	for i := 0; i < reflectValue.NumField(); i++ {
+		field := reflectValue.Field(i)
+
+		switch field.Kind() {
+		case reflect.Uint32:
+			field.SetUint(uint64(binary.LittleEndian.Uint32(data[curByte:curByte+4])))
+			curByte += 4
+		case reflect.Float32:
+			field.SetFloat(float64(math.Float32frombits(binary.LittleEndian.Uint32(data[curByte:curByte+4]))))
+			curByte += 4
+		case reflect.Bool:
+			field.SetBool(data[curByte] != 0)
+			curByte++
+		default:
+			log.Fatal("Error parsing data from teensy, bad use of reflection")
+		}
+	}
+
+	log.Println(retval)
+	return &retval
+}
+
 
 func getDataPacket(conn net.Conn) (*DataPacket, error) {
 	retval := DataPacket{}
 	reflectValue := reflect.ValueOf(&retval).Elem()
-	log.Print("Num fields: ")
-	log.Println(reflectValue.NumField())
 	for i := 0; i < reflectValue.NumField(); i++ {
 		field := reflectValue.Field(i)
 
