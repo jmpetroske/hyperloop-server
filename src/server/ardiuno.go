@@ -101,7 +101,8 @@ func udpSocket() {
 func getDataPacket(conn net.Conn) (*DataPacket, error) {
 	retval := DataPacket{}
 	reflectValue := reflect.ValueOf(&retval).Elem()
-	log.Println("Num fields: " + reflectValue.NumField())
+	log.Print("Num fields: ")
+	log.Println(reflectValue.NumField())
 	for i := 0; i < reflectValue.NumField(); i++ {
 		field := reflectValue.Field(i)
 
