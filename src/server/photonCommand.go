@@ -28,6 +28,7 @@ const (
 
 type PhotonCommand interface {
 	WriteCommand() []byte
+	ExpectedNextMode() uint32 // For testing fake arduino mode
 }
 
 type MissionParamsCommand struct {
@@ -45,6 +46,10 @@ func (c *MissionParamsCommand) WriteCommand() []byte {
 	return contents
 }
 
+func (*MissionParamsCommand) ExpectedNextMode() uint32 {
+	return 1
+}
+
 type GoToIdleCommand struct {
 }
 
@@ -52,6 +57,10 @@ func (*GoToIdleCommand) WriteCommand() []byte {
 	contents := make([]byte, 4)
 	binary.LittleEndian.PutUint32(contents[0:4], GoToIdleCommandNum)
 	return contents
+}
+
+func (*GoToIdleCommand) ExpectedNextMode() uint32 {
+	return 0
 }
 
 type ArmCommand struct {
@@ -63,6 +72,10 @@ func (*ArmCommand) WriteCommand() []byte {
 	return contents
 }
 
+func (*ArmCommand) ExpectedNextMode() uint32 {
+	return 2
+}
+
 type StartCommand struct {
 }
 
@@ -70,6 +83,10 @@ func (*StartCommand) WriteCommand() []byte {
 	contents := make([]byte, 4)
 	binary.LittleEndian.PutUint32(contents[0:4], GoToAcceleratingCommandNum)
 	return contents
+}
+
+func (*StartCommand) ExpectedNextMode() uint32 {
+	return 3
 }
 
 type TestingCommand struct {
@@ -83,9 +100,17 @@ func (t *TestingCommand) WriteCommand() []byte {
 	return contents
 }
 
+func (*TestingCommand) ExpectedNextMode() uint32 {
+	return 0
+}
+
 type AbortCommand struct {
 }
 
 func (*AbortCommand) WriteCommand() []byte {
 	return make([]byte, 1)
+}
+
+func (*AbortCommand) ExpectedNextMode() uint32 {
+	return 0
 }

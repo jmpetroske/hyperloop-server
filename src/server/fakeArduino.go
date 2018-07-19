@@ -50,7 +50,9 @@ var testData DataPacket = DataPacket{
 func startFakeArduino() {
 	go func() {
 		for {
-			log.Println(<-commandChan)
+			c := <-commandChan
+			testData.Mode = c.ExpectedNextMode()
+			log.Println(c)
 		}
 	}()
 
