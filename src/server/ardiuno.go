@@ -82,8 +82,13 @@ func udpSocket() {
 
 	for {
 		dataPacket, err := getDataPacket(udpConn)
-		if err != nil {
 
+		// recvbuf := make([]byte, 512)
+		// numBytes, srcAddr, err := udpConn.ReadFromUDP(recvbuf)
+		if err != nil {
+			log.Print("Error receiving udp packet: ")
+			log.Println(err)
+			continue
 		}
 		latestDataMutex.Lock()
 		latestData = dataPacket
@@ -91,9 +96,12 @@ func udpSocket() {
 	}
 }
 
+// func getPacketFromUDP(
+
 func getDataPacket(conn net.Conn) (*DataPacket, error) {
 	retval := DataPacket{}
 	reflectValue := reflect.ValueOf(&retval).Elem()
+	log.Println("Num fields: " + reflectValue.NumField())
 	for i := 0; i < reflectValue.NumField(); i++ {
 		field := reflectValue.Field(i)
 
@@ -124,5 +132,6 @@ func getDataPacket(conn net.Conn) (*DataPacket, error) {
 		}
 	}
 
+	log.Println(retval)
 	return &retval, nil
 }
